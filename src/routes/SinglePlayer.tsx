@@ -32,9 +32,9 @@ export function SinglePlayer() {
     data && data.data
       ? getCounterFields(data.data as ExtendedSuiObjectResponse)
       : null;
-  const points = fields?.points || "N/A";
-  const lives = fields?.lives || "N/A";
-  const inGame = fields?.inGame || false;
+  const points = fields?.total_points || "N/A";
+  const lives = fields?.current_lives || "N/A";
+  const inGame = fields?.in_session || false;
 
   // Debugging: Log the full data object to inspect its structure
   console.log("Sui Object Data:", data);
@@ -79,7 +79,7 @@ export function SinglePlayer() {
             <h2 className="text-4xl font-bold mb-2">
               Welcome to the Quiz Game!
             </h2>
-            <p className="mb-4 text-2xl">
+            <div className="mb-4 text-2xl">
               Test your knowledge with our exciting quiz game. Answer questions
               to earn points and try to keep your lives from reaching zero.
               <br />
@@ -98,7 +98,7 @@ export function SinglePlayer() {
                 </li>
               </ul>
               Ready to start? Click the "Create Game" button below to begin.
-            </p>
+            </div>
             <button
               className="btn btn-primary mt-4"
               onClick={() => setShowInstructions(false)}
@@ -137,9 +137,9 @@ interface ExtendedSuiObjectResponse extends SuiObjectResponse {
   content?: {
     dataType: string;
     fields: {
-      points: number;
-      lives: number;
-      inGame: boolean;
+      total_points: number;
+      current_lives: number;
+      in_session: boolean;
     };
   };
 }

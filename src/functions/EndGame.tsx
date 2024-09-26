@@ -5,13 +5,15 @@ import { useNetworkVariable } from "../networkConfig";
 import { isValidSuiObjectId } from "@mysten/sui/utils";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { useQuizStore } from "../store/store";
+import { PLAYER_STATS_ID } from "../constants";
 
 export const EndGame = ({ onCreated }: { onCreated: (id: string) => void }) => {
-  const { score } = useQuizStore();
+  const { score, resetQuiz } = useQuizStore();
 
   const points = score * 2;
 
   const counterPackageId = useNetworkVariable("counterPackageId");
+  const playerStatsId = PLAYER_STATS_ID;
   const suiClient = useSuiClient();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction({
     execute: async ({ bytes, signature }) =>
@@ -56,8 +58,12 @@ export const EndGame = ({ onCreated }: { onCreated: (id: string) => void }) => {
     const tx = new Transaction();
 
     tx.moveCall({
-      arguments: [tx.object(gameId!), tx.pure.u64(points)],
-      target: `${counterPackageId}::counter::end_game`,
+      arguments: [
+        tx.object(gameId!),
+        tx.object(playerStatsId!),
+        tx.pure.u64(points),
+      ],
+      target: `${counterPackageId}::counter::end_session`,
     });
 
     signAndExecute(
@@ -69,6 +75,7 @@ export const EndGame = ({ onCreated }: { onCreated: (id: string) => void }) => {
           const objectId = result.effects?.created?.[0]?.reference?.objectId;
           if (objectId) {
             onCreated(objectId);
+            resetQuiz();
           }
           refetch();
         },
